@@ -8,7 +8,7 @@ import os, re, sys, threading, time
 ## Third-Party Imports
 from bs4 import BeautifulSoup
 
-VERSION = "0.1.0b released 2015-01-29"
+VERSION = "0.1.1b released 2015-01-30"
 
 ## Global Variables - Lazy Mode
 
@@ -73,33 +73,33 @@ def writeDiff():
 		## Change
 		if (new_seconds > 0):
 			if (bool_stdout == 1):
-				change_text += "\n    Gameplay Time: " + (time.strftime("%H:%M:%S", time.gmtime(float(new_seconds))))
+				change_text += "\n    Gameplay Time: +" + (time.strftime("%H:%M:%S", time.gmtime(float(new_seconds))))
 
-			output_diff_file.write(str(time.strftime("%H:%M:%S", time.gmtime(float(new_seconds)))) + "\n")
+			output_diff_file.write("+" + str(time.strftime("%H:%M:%S", time.gmtime(float(new_seconds)))) + "\n")
 			bool_change = 1
 			
 		## No Change. 
 		else:
 			output_diff_file.write("\n")
 
-		new_notes = current_notes - previous_notes	
+		new_notes = current_notes - previous_notes
 		if (new_notes > 0):
 			if (bool_stdout == 1):
-				change_text += "\n    Notes Tapped: "  + str(new_notes)
+				change_text += "\n     Notes Tapped: +"  + str(new_notes)
 				
-			output_diff_file.write(str(new_notes) + "\n")
+			output_diff_file.write("+" + str(new_notes) + "\n")
 			bool_change = 1			
 
 		## No Change. 
 		else:
 			output_diff_file.write("\n")
 
-		new_songs = current_songs - previous_songs	
+		new_songs = current_songs - previous_songs
 		if (new_songs > 0):
 			if (bool_stdout == 1):
-				change_text += "\n    Songs Played: "  + str(new_songs)
+				change_text += "\n     Songs Played: +"  + str(new_songs)
 				
-			output_diff_file.write(str(new_songs) + "\n")
+			output_diff_file.write("+" + str(new_songs) + "\n")
 			bool_change = 1			
 
 		## No Change. 
@@ -108,14 +108,21 @@ def writeDiff():
 
 	if (bool_stdout == 1 and bool_change == 1):
 		print(change_text)
-
+	
+	output_diff_file.close()
+	
 	## Sleep then clear and close the files.
 	for i in range(int(diff_refresh) * 4):
 		if (bool_exit == 1):
 			return
 
 		time.sleep(0.25)
-			
+
+	output_diff_file = open(output_diff_path, "w+")
+	output_diff_file.write(" \n \n \n ")	
+	output_diff_file.close()
+	
+		
 ## writeStats - Writes the player stats to a text file.
 def writeStats():
 	## Open the file displayed on stream, write to it and close it.
@@ -133,8 +140,8 @@ def writeStats():
 
 	output_stats_file.write(str(display_name) + "\n")
 	output_stats_file.write("Gameplay Time: " + str(current_time) + "\n")
-	output_stats_file.write("Notes Tapped: " + str(current_notes) + "\n")
-	output_stats_file.write("Songs Played: " + str(current_songs))
+	output_stats_file.write(" Notes Tapped: " + str(current_notes) + "\n")
+	output_stats_file.write(" Songs Played: " + str(current_songs) + "\n")
 	output_stats_file.close()
 
 ## Validate # of CLA
@@ -242,7 +249,18 @@ for each in config_bools:
 	if (each == 0):
 		print("\n    Invalid configuration. At least one required attribute is missing. See the Step Stats Watcher wiki for more information.")
 		sys.exit()	
-				
+
+## Exit if the stats_refresh is smaller than 10 seconds.
+if (float(stats_refresh) < 10):
+	print("\n    Invalid configuration. stats_refresh must be at least 10.")
+	sys.exit()
+	
+## Exit if stats_refresh is smaller than diff_refresh.
+if (float(stats_refresh) <= float(diff_refresh)):
+	print("\n    Invalid configuration. diff_refresh must be smaller than stats_refresh.")
+	sys.exit()	
+
+		
 print("\nStep Stats Watcher is running. Press CTRL+C to exit.")
 
 bool_init_stats = 1
@@ -265,10 +283,10 @@ while(1):
 
 		## Note the initial stats.
 		if (bool_init_stats == 1):
-			start_display   = display_name
-			start_seconds   = current_seconds
-			start_notes     = current_notes
-			start_songs     = current_songs
+			start_display = display_name
+			start_seconds = current_seconds
+			start_notes   = current_notes
+			start_songs   = current_songs
 
 			bool_init_stats = 0
 		
@@ -279,22 +297,22 @@ while(1):
 		if (bool_diff == 1):
 			WriteDiffThread()
 
+		## Update every second since that's how often gameplay time updates.
+		time.sleep(float(stats_refresh))
+
 		## Fill in the previous values to compare.			
 		previous_seconds = current_seconds
 		previous_notes   = current_notes
 		previous_songs   = current_songs
 		
-		## Update every second since that's how often gameplay time updates.
-		time.sleep(float(stats_refresh))
-
 	except KeyboardInterrupt:
 		print("\nCTRL+C Detected. Exiting...")
 		
 		if (bool_stdout == 1):
 			print("\n== Session Summary ==")
-			print("Gameplay Time: " + str(time.strftime("%H:%M:%S", time.gmtime(float(current_seconds - start_seconds)))))
-			print("Notes Tapped: "  + str(current_notes - start_notes))
-			print("Songs Played: "  + str(current_songs - start_songs))
+			print("    Gameplay Time: " + str(time.strftime("%H:%M:%S", time.gmtime(float(current_seconds - start_seconds)))))
+			print("     Notes Tapped: "  + str(current_notes - start_notes))
+			print("     Songs Played: "  + str(current_songs - start_songs))
 
 		## Signal to the child thread to exit.
 		bool_exit = 1
