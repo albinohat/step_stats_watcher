@@ -1,0 +1,19 @@
+## Files
+/src/osu_apy.py
+
+## File Extensions.
+**.bat
+**.ico
+**.json
+**.pyc
+**.spec
+**.txt
+
+## Folders
+/config
+/src/2.7/build
+/src/2.7/dist
+/src/3.4/build
+/src/3.4/dist
+
+## End of .gitignore
