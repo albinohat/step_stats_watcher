@@ -85,7 +85,7 @@ def writeDiff():
 		new_notes = current_notes - previous_notes
 		if (new_notes > 0):
 			if (bool_stdout == 1):
-				change_text += "\n     Notes Tapped: +"  + str('{0:,}'.format(current_notes))
+				change_text += "\n     Notes Tapped: +"  + str('{0:,}'.format(new_notes))
 				
 			output_diff_file.write("+" + str('{0:,}'.format(current_notes)) + "\n")
 			bool_change = 1			
