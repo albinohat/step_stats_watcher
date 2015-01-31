@@ -8,9 +8,9 @@ import os, re, sys, threading, time
 ## Third-Party Imports
 from bs4 import BeautifulSoup
 
-VERSION = "0.1.1b released 2015-01-30"
-
 ## Global Variables - Lazy Mode
+
+VERSION = "0.1.2b released 2015-01-30"
 
 ## Initialize a list to check that all the required attributes are present.
 config_bools     = [0, 0, 0, 0, 0]
@@ -85,9 +85,9 @@ def writeDiff():
 		new_notes = current_notes - previous_notes
 		if (new_notes > 0):
 			if (bool_stdout == 1):
-				change_text += "\n     Notes Tapped: +"  + str(new_notes)
+				change_text += "\n     Notes Tapped: +"  + str('{0:,}'.format(current_notes))
 				
-			output_diff_file.write("+" + str(new_notes) + "\n")
+			output_diff_file.write("+" + str('{0:,}'.format(current_notes)) + "\n")
 			bool_change = 1			
 
 		## No Change. 
@@ -139,9 +139,9 @@ def writeStats():
 		sys.exit()
 
 	output_stats_file.write(str(display_name) + "\n")
-	output_stats_file.write("Gameplay Time: " + str(current_time) + "\n")
-	output_stats_file.write(" Notes Tapped: " + str(current_notes) + "\n")
-	output_stats_file.write(" Songs Played: " + str(current_songs) + "\n")
+	output_stats_file.write(" Time: " + str(current_time) + "\n")
+	output_stats_file.write("Notes: " + str('{0:,}'.format(current_notes)) + "\n")
+	output_stats_file.write("Songs: " + str(current_songs) + "\n")
 	output_stats_file.close()
 
 ## Validate # of CLA
@@ -311,7 +311,7 @@ while(1):
 		if (bool_stdout == 1):
 			print("\n== Session Summary ==")
 			print("    Gameplay Time: " + str(time.strftime("%H:%M:%S", time.gmtime(float(current_seconds - start_seconds)))))
-			print("     Notes Tapped: "  + str(current_notes - start_notes))
+			print("     Notes Tapped: "  + str('{0:,}'.format(current_notes - start_notes)))
 			print("     Songs Played: "  + str(current_songs - start_songs))
 
 		## Signal to the child thread to exit.
