@@ -139,7 +139,7 @@ def writeStats():
 		sys.exit()
 
 	output_stats_file.write(str(display_name) + "\n")
-	output_stats_file.write(" Time: " + str(current_time) + "\n")
+	output_stats_file.write("Time: " + str(current_time) + "\n")
 	output_stats_file.write("Notes: " + str('{0:,}'.format(current_notes)) + "\n")
 	output_stats_file.write("Songs: " + str(current_songs) + "\n")
 	output_stats_file.close()
